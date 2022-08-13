@@ -1,4 +1,5 @@
 import config
+import logging
 import tensorflow
 import tensorflow as tf
 import itertools
@@ -29,7 +30,7 @@ def load_easter_model(checkpoint_path):
         checkpoint = tensorflow.keras.models.load_model(
             checkpoint_path,
             custom_objects={'<lambda>': lambda x, y: y,
-            'tf':tf}
+            'tensorflow':tf, 'K':K}
         )
         
         EASTER = tensorflow.keras.models.Model(
@@ -37,8 +38,8 @@ def load_easter_model(checkpoint_path):
             checkpoint.get_layer('Final').output
         )
     except:
-        print ("Unable to Load Checkpoint.")
-        return None
+        logging.error("Unable to Load Checkpoint.", exc_info=True)
+        raise
     return EASTER
     
 def decoder(output,letters):
@@ -99,3 +100,8 @@ def test_on_iam(show = True, partition='test', uncased=False, checkpoint="Empty"
                 print("Prediction [",edit_distance(output,truth),"]  : ",output)
                 print ("*"*50)
     print ("Character error rate is : ",(char_error/total_chars)*100)
+
+
+if __name__ == '__main__':
+    test_on_iam()
+
